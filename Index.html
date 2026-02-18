@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathArena - Latihan Matematika</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --bg-secondary: #111827;
+            --fg: #e8edf5;
+            --muted: #6b7a94;
+            --accent: #00d4aa;
+            --accent-glow: rgba(0, 212, 170, 0.3);
+            --card: rgba(17, 24, 39, 0.8);
+            --border: rgba(107, 122, 148, 0.2);
+            --danger: #ff4757;
+            --success: #00d4aa;
+            --warning: #ffa502;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-display {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Animated Background */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-pattern::before {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 212, 170, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0, 150, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 212, 170, 0.03) 0%, transparent 70%);
+            animation: bgPulse 15s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
+        }
+
+        .grid-lines {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 212, 170, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        /* Floating Particles */
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+            50% { transform: translateY(-100px) scale(1.5); opacity: 0.8; }
+        }
+
+        /* Main Container */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 14, 23, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--fg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--fg) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--muted);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem 2rem;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            min-width: 140px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Rank Badge */
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 1rem;
+            animation: rankGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes rankGlow {
+            0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+            50% { box-shadow: 0 0 40px var(--accent-glow); }
+        }
+
+        .rank-novice { background: linear-gradient(135deg, #4a5568, #2d3748); }
+        .rank-apprentice { background: linear-gradient(135deg, #38a169, #276749); }
+        .rank-scholar { background: linear-gradient(135deg, #3182ce, #2c5282); }
+        .rank-expert { background: linear-gradient(135deg, #d69e2e, #b7791f); }
+        .rank-master { background: linear-gradient(135deg, #e53e3e, #c53030); }
+        .rank-grandmaster { background: linear-gradient(135deg, #805ad5, #6b46c1); }
+        .rank-legend { background: linear-gradient(135deg, #00d4aa, #00a884); }
+
+        /* Sections */
+        .section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-desc {
+            color: var(--muted);
+        }
+
+        /* Difficulty Cards */
+        .difficulty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .difficulty-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .difficulty-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-accent, var(--accent));
+        }
+
+        .difficulty-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--card-accent, var(--accent));
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .difficulty-card.easy { --card-accent: #00d4aa; }
+        .difficulty-card.medium { --card-accent: #ffa502; }
+        .difficulty-card.hard { --card-accent: #ff4757; }
+        .difficulty-card.extreme { --card-accent: #805ad5; }
+
+        .difficulty-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--card-accent);
+        }
+
+        .difficulty-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .difficulty-desc {
+            color: var(--muted);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-points {
+            font-size: 0.875rem;
+            color: var(--card-accent);
+            font-weight: 600;
+        }
+
+        /* Quiz Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .quiz-container {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent);
+            background: rgba(0, 212, 170, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .quiz-progress {
+            font-size: 0.875rem;
+            color: var(--muted);
+        }
+
+        .question-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-hint {
+            color: var(--muted);
+            font-size: 0.875rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--fg);
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        .option-btn.correct {
+            border-color: var(--success);
+            background: rgba(0, 212, 170, 0.2);
+            color: var(--success);
+        }
+
+        .option-btn.wrong {
+            border-color: var(--danger);
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--danger);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        /* Leaderboard */
+        .leaderboard-container {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .leaderboard-header {
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), transparent);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .leaderboard-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .leaderboard-list {
+            padding: 1rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .leaderboard-item.current-user {
+            border: 1px solid var(--accent);
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        .rank-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffb300); color: #000; }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #a0a0a0); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #a0522d); color: #fff; }
+        .rank-other { background: var(--border); color: var(--muted); }
+
+        .player-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #0096ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-weight: 600;
+            margin-bottom: 0.125rem;
+        }
+
+        .player-rank {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .player-score {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1.125rem;
+        }
+
+        /* Rank Progress */
+        .rank-progress-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .current-rank-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .current-rank-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .rank-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .rank-points {
+            color: var(--muted);
+            font-size: 0.875rem;
+        }
+
+        .progress-bar-container {
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #00ffcc);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--muted);
+            margin-top: 0.5rem;
+        }
+
+        .ranks-list {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+
+        .ranks-list::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .ranks-list::-webkit-scrollbar-track {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .ranks-list::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .rank-item {
+            flex-shrink: 0;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 100px;
+            opacity: 0.5;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .rank-item.current {
+            opacity: 1;
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .rank-item.passed {
+            opacity: 0.7;
+        }
+
+        .rank-item-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .rank-item-points {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        /* Result Modal */
+        .result-container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .result-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+
+        .result-icon.success {
+            background: rgba(0, 212, 170, 0.2);
+            color: var(--success);
+        }
+
+        .result-score {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-message {
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--fg);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            max-width: 100vw;
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            z-index: 300;
+            transition: right 0.3s ease;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .settings-panel.active {
+            right: 0;
+        }
+
+        .settings-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 250;
+            display: none;
+        }
+
+        .settings-overlay.active {
+            display: block;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .settings-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+        }
+
+        .close-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--fg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--fg);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            z-index: 400;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-color: var(--success);
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-content {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .hero {
+                padding: 6rem 1rem 2rem;
+            }
+
+            .stats-bar {
+                gap: 1rem;
+            }
+
+            .stat-item {
+                min-width: 100px;
+                padding: 0.75rem 1rem;
+            }
+
+            .section {
+                padding: 2rem 1rem;
+            }
+
+            .quiz-container {
+                padding: 1.5rem;
+            }
+
+            .question-text {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="bg-pattern">
+        <div class="grid-lines"></div>
+    </div>
+
+    <!-- Particles -->
+    <div id="particles"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="nav-content">
+                <div class="logo">MathArena</div>
+                <div class="nav-links">
+                    <button class="nav-btn active" data-page="home">Beranda</button>
+                    <button class="nav-btn" data-page="leaderboard">Peringkat</button>
+                    <button class="nav-btn" id="settingsBtn">Pengaturan</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Home Page -->
+        <main id="homePage">
+            <!-- Hero -->
+            <section class="hero">
+                <h1 class="hero-title">Kuasai Matematika</h1>
+                <p class="hero-subtitle">Latih kemampuan matematikamu, kumpulkan poin, dan bersainglah untuk menjadi yang terbaik di peringkat global.</p>
+                
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalPoints">0</div>
+                        <div class="stat-label">Total Poin</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCorrect">0</div>
+                        <div class="stat-label">Benar</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="accuracy">0%</div>
+                        <div class="stat-label">Akurasi</div>
+                    </div>
+                </div>
+
+                <div id="currentRankBadge" class="rank-badge rank-novice">
+                    <span>Novice</span>
+                </div>
+            </section>
+
+            <!-- Rank Progress -->
+            <section class="section">
+                <div class="rank-progress-section">
+                    <div class="progress-header">
+                        <div class="current-rank-info">
+                            <div id="currentRankIcon" class="current-rank-icon rank-novice">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div id="currentRankName" class="rank-name">Novice</div>
+                                <div id="currentRankPointsText" class="rank-points">0 / 100 poin</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressCurrent">0 poin</span>
+                            <span id="progressNext">Novice</span>
+                        </div>
+                    </div>
+
+                    <div id="ranksList" class="ranks-list"></div>
+                </div>
+            </section>
+
+            <!-- Difficulty Selection -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Pilih Tingkat Kesulitan</h2>
+                    <p class="section-desc">Semakin sulit, semakin banyak poin yang kamu dapatkan</p>
+                </div>
+
+                <div class="difficulty-grid">
+                    <div class="difficulty-card easy" data-difficulty="easy">
+                        <div class="difficulty-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                                <line x1="9" y1="9" x2="9.01" y2="9"/>
+                                <line x1="15" y1="9" x2="15.01" y2="9"/>
+                            </svg>
+                        </div>
+                        <div class="difficulty-name">Mudah</div>
+                        <div class="difficulty-desc">Penjumlahan, pengurangan, perkalian dasar</div>
+                        <div class="difficulty-points">+10 poin per jawaban benar</div>
+                    </div>
+
+                    <div class="difficulty-card medium" data-difficulty="medium">
+                        <div class="difficulty-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                            </svg>
+                        </div>
+                        <div class="difficulty-name">Menengah</div>
+                        <div class="difficulty-desc">Pembagian, pecahan sederhana, persentase</div>
+                        <div class="difficulty-points">+20 poin per jawaban benar</div>
+                    </div>
+
+                    <div class="difficulty-card hard" data-difficulty="hard">
+                        <div class="difficulty-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 6.5 5.5 17.5 18.5 17.5 12 6.5"/>
+                                <line x1="12" y1="2" x2="12" y2="6.5"/>
+                                <line x1="5.5" y1="17.5" x2="3" y2="20"/>
+                                <line x1="18.5" y1="17.5" x2="21" y2="20"/>
+                            </svg>
+                        </div>
+                        <div class="difficulty-name">Sulit</div>
+                        <div class="difficulty-desc">Aljabar, persamaan, operasi campuran</div>
+                        <div class="difficulty-points">+30 poin per jawaban benar</div>
+                    </div>
+
+                    <div class="difficulty-card extreme" data-difficulty="extreme">
+                        <div class="difficulty-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                            </svg>
+                        </div>
+                        <div class="difficulty-name">Ekstrem</div>
+                        <div class="difficulty-desc">Pangkat, akar, logaritma, geometri</div>
+                        <div class="difficulty-points">+50 poin per jawaban benar</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Leaderboard Page -->
+        <main id="leaderboardPage" style="display: none;">
+            <section class="section" style="padding-top: 8rem;">
+                <div class="section-header">
+                    <h2 class="section-title">Papan Peringkat Global</h2>
+                    <p class="section-desc">Bersaing dengan pemain lain dari seluruh dunia</p>
+                </div>
+
+                <div class="leaderboard-container">
+                    <div class="leaderboard-header">
+                        <div class="leaderboard-title">Top Pemain</div>
+                        <div class="leaderboard-tabs">
+                            <button class="tab-btn active" data-period="all">Semua Waktu</button>
+                            <button class="tab-btn" data-period="week">Minggu Ini</button>
+                            <button class="tab-btn" data-period="month">Bulan Ini</button>
+                        </div>
+                    </div>
+                    <div id="leaderboardList" class="leaderboard-list"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="modal-overlay">
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <div class="quiz-timer" id="quizTimer">30</div>
+                <div class="quiz-progress">Soal <span id="currentQuestion">1</span> dari <span id="totalQuestions">10</span></div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-text" id="questionText">12 + 8 = ?</div>
+                <div class="question-hint" id="questionHint">Pilih jawaban yang benar</div>
+            </div>
+
+            <div class="options-grid" id="optionsGrid"></div>
+
+            <div id="quizActions" style="text-align: center;"></div>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="resultModal" class="modal-overlay">
+        <div class="quiz-container">
+            <div class="result-container">
+                <div class="result-icon success">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
+                <div class="result-score" id="resultScore">0</div>
+                <div class="result-message" id="resultMessage">Kerja bagus!</div>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button class="btn btn-secondary" onclick="closeResult()">Kembali</button>
+                    <button class="btn btn-primary" onclick="restartQuiz()">Main Lagi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settingsOverlay" class="settings-overlay"></div>
+    <div id="settingsPanel" class="settings-panel">
+        <div class="settings-header">
+            <div class="settings-title">Pengaturan</div>
+            <button class="close-btn" id="closeSettings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Nama Pemain</label>
+            <input type="text" id="playerNameInput" class="form-input" placeholder="Masukkan namamu">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Jumlah Soal per Sesi</label>
+            <select id="questionCountSelect" class="form-input">
+                <option value="5">5 Soal</option>
+                <option value="10" selected>10 Soal</option>
+                <option value="15">15 Soal</option>
+                <option value="20">20 Soal</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Waktu per Soal (detik)</label>
+            <select id="timePerQuestionSelect" class="form-input">
+                <option value="15">15 detik</option>
+                <option value="30" selected>30 detik</option>
+                <option value="45">45 detik</option>
+                <option value="60">60 detik</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="saveSettings()">Simpan Pengaturan</button>
+        <button class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem;" onclick="resetProgress()">Reset Progress</button>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // =====================
+        // Data & Configuration
+        // =====================
+        const RANKS = [
+            { name: 'Novice', minPoints: 0, maxPoints: 99, class: 'rank-novice', color: '#6b7a94' },
+            { name: 'Apprentice', minPoints: 100, maxPoints: 249, class: 'rank-apprentice', color: '#38a169' },
+            { name: 'Scholar', minPoints: 250, maxPoints: 499, class: 'rank-scholar', color: '#3182ce' },
+            { name: 'Expert', minPoints: 500, maxPoints: 999, class: 'rank-expert', color: '#d69e2e' },
+            { name: 'Master', minPoints: 1000, maxPoints: 1999, class: 'rank-master', color: '#e53e3e' },
+            { name: 'Grandmaster', minPoints: 2000, maxPoints: 4999, class: 'rank-grandmaster', color: '#805ad5' },
+            { name: 'Legend', minPoints: 5000, maxPoints: Infinity, class: 'rank-legend', color: '#00d4aa' }
+        ];
+
+        const DIFFICULTY_CONFIG = {
+            easy: { points: 10, time: 30 },
+            medium: { points: 20, time: 40 },
+            hard: { points: 30, time: 50 },
+            extreme: { points: 50, time: 60 }
+        };
+
+        // Simulated leaderboard data
+        let leaderboardData = [
+            { name: 'MathWiz', points: 8540, rank: 'Legend', avatar: 'MW' },
+            { name: 'NumberCruncher', points: 6230, rank: 'Legend', avatar: 'NC' },
+            { name: 'CalcMaster', points: 4890, rank: 'Grandmaster', avatar: 'CM' },
+            { name: 'AlgebraKing', points: 3560, rank: 'Grandmaster', avatar: 'AK' },
+            { name: 'ProblemSolver', points: 2890, rank: 'Master', avatar: 'PS' },
+            { name: 'EquationExpert', points: 2100, rank: 'Master', avatar: 'EE' },
+            { name: 'MathNinja', points: 1650, rank: 'Master', avatar: 'MN' },
+            { name: 'CalcPro', points: 1200, rank: 'Master', avatar: 'CP' },
+            { name: 'NumberGenius', points: 890, rank: 'Expert', avatar: 'NG' },
+            { name: 'MathHero', points: 650, rank: 'Expert', avatar: 'MH' }
+        ];
+
+        // User state
+        let userData = {
+            name: 'Player',
+            points: 0,
+            correctAnswers: 0,
+            totalAnswers: 0,
+            currentDifficulty: 'easy'
+        };
+
+        // Quiz state
+        let quizState = {
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            correctCount: 0,
+            timeLeft: 30,
+            timerInterval: null,
+            difficulty: 'easy',
+            questionCount: 10,
+            timePerQuestion: 30
+        };
+
+        // =====================
+        // Initialization
+        // =====================
+        function init() {
+            loadUserData();
+            createParticles();
+            updateUI();
+            renderRanksList();
+            renderLeaderboard();
+            setupEventListeners();
+        }
+
+        function loadUserData() {
+            const saved = localStorage.getItem('mathArenaData');
+            if (saved) {
+                userData = { ...userData, ...JSON.parse(saved) };
+            }
+            
+            const settings = localStorage.getItem('mathArenaSettings');
+            if (settings) {
+                const s = JSON.parse(settings);
+                quizState.questionCount = s.questionCount || 10;
+                quizState.timePerQuestion = s.timePerQuestion || 30;
+                document.getElementById('playerNameInput').value = userData.name;
+                document.getElementById('questionCountSelect').value = s.questionCount || 10;
+                document.getElementById('timePerQuestionSelect').value = s.timePerQuestion || 30;
+            }
+        }
+
+        function saveUserData() {
+            localStorage.setItem('mathArenaData', JSON.stringify(userData));
+        }
+
+        // =====================
+        // Particle System
+        // =====================
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // =====================
+        // UI Updates
+        // =====================
+        function updateUI() {
+            document.getElementById('totalPoints').textContent = userData.points;
+            document.getElementById('totalCorrect').textContent = userData.correctAnswers;
+            
+            const accuracy = userData.totalAnswers > 0 
+                ? Math.round((userData.correctAnswers / userData.totalAnswers) * 100) 
+                : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+
+            const currentRank = getCurrentRank();
+            
+            // Update rank badge
+            const badge = document.getElementById('currentRankBadge');
+            badge.className = 'rank-badge ' + currentRank.class;
+            badge.innerHTML = `<span>${currentRank.name}</span>`;
+
+            // Update rank info
+            document.getElementById('currentRankName').textContent = currentRank.name;
+            document.getElementById('currentRankIcon').className = 'current-rank-icon ' + currentRank.class;
+            
+            const nextRank = getNextRank();
+            const progress = nextRank 
+                ? ((userData.points - currentRank.minPoints) / (nextRank.minPoints - currentRank.minPoints)) * 100
+                : 100;
+            
+            document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
+            document.getElementById('progressCurrent').textContent = userData.points + ' poin';
+            document.getElementById('progressNext').textContent = nextRank ? nextRank.name : 'MAX';
+            
+            if (nextRank) {
+                document.getElementById('currentRankPointsText').textContent = 
+                    `${userData.points} / ${nextRank.minPoints} poin`;
+            } else {
+                document.getElementById('currentRankPointsText').textContent = `${userData.points} poin (MAX)`;
+            }
+        }
+
+        function getCurrentRank() {
+            for (let i = RANKS.length - 1; i >= 0; i--) {
+                if (userData.points >= RANKS[i].minPoints) {
+                    return RANKS[i];
+                }
+            }
+            return RANKS[0];
+        }
+
+        function getNextRank() {
+            const current = getCurrentRank();
+            const currentIndex = RANKS.indexOf(current);
+            if (currentIndex < RANKS.length - 1) {
+                return RANKS[currentIndex + 1];
+            }
+            return null;
+        }
+
+        function renderRanksList() {
+            const container = document.getElementById('ranksList');
+            const currentRank = getCurrentRank();
+            
+            container.innerHTML = RANKS.map(rank => {
+                let status = '';
+                if (rank.name === currentRank.name) status = 'current';
+                else if (userData.points >= rank.maxPoints + 1) status = 'passed';
+                
+                return `
+                    <div class="rank-item ${status} ${rank.class}" style="background: ${status ? rank.color + '20' : 'transparent'}">
+                        <div class="rank-item-name" style="color: ${rank.color}">${rank.name}</div>
+                        <div class="rank-item-points">${rank.minPoints}+ poin</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardList');
+            
+            // Add current user to leaderboard
+            const allPlayers = [...leaderboardData];
+            const currentRank = getCurrentRank();
+            
+            allPlayers.push({
+                name: userData.name,
+                points: userData.points,
+                rank: currentRank.name,
+                avatar: userData.name.substring(0, 2).toUpperCase(),
+                isCurrentUser: true
+            });
+            
+            // Sort by points
+            allPlayers.sort((a, b) => b.points - a.points);
+            
+            // Find user position
+            const userPosition = allPlayers.findIndex(p => p.isCurrentUser) + 1;
+            
+            // Show top 20
+            const top20 = allPlayers.slice(0, 20);
+            
+            container.innerHTML = top20.map((player, index) => {
+                const rankClass = index < 3 ? `rank-${index + 1}` : 'rank-other';
+                const playerRank = RANKS.find(r => r.name === player.rank) || RANKS[0];
+                
+                return `
+                    <div class="leaderboard-item ${player.isCurrentUser ? 'current-user' : ''}">
+                        <div class="rank-number ${rankClass}">${index + 1}</div>
+                        <div class="player-avatar" style="background: linear-gradient(135deg, ${playerRank.color}, ${playerRank.color}88)">
+                            ${player.avatar}
+                        </div>
+                        <div class="player-info">
+                            <div class="player-name">${player.name} ${player.isCurrentUser ? '(Kamu)' : ''}</div>
+                            <span class="player-rank ${playerRank.class}" style="background: ${playerRank.color}33; color: ${playerRank.color}">
+                                ${player.rank}
+                            </span>
+                        </div>
+                        <div class="player-score">${player.points.toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // =====================
+        // Question Generator
+        // =====================
+        function generateQuestion(difficulty) {
+            const generators = {
+                easy: generateEasyQuestion,
+                medium: generateMediumQuestion,
+                hard: generateHardQuestion,
+                extreme: generateExtremeQuestion
+            };
+            
+            return generators[difficulty]();
+        }
+
+        function generateEasyQuestion() {
+            const types = ['add', 'subtract', 'multiply'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            let a, b, answer, text;
+            
+            switch (type) {
+                case 'add':
+                    a = Math.floor(Math.random() * 50) + 1;
+                    b = Math.floor(Math.random() * 50) + 1;
+                    answer = a + b;
+                    text = `${a} + ${b} = ?`;
+                    break;
+                case 'subtract':
+                    a = Math.floor(Math.random() * 50) + 20;
+                    b = Math.floor(Math.random() * Math.min(a, 30)) + 1;
+                    answer = a - b;
+                    text = `${a} - ${b} = ?`;
+                    break;
+                case 'multiply':
+                    a = Math.floor(Math.random() * 12) + 1;
+                    b = Math.floor(Math.random() * 12) + 1;
+                    answer = a * b;
+                    text = `${a} x ${b} = ?`;
+                    break;
+            }
+            
+            return { text, answer, hint: 'Operasi dasar' };
+        }
+
+        function generateMediumQuestion() {
+            const types = ['divide', 'fraction', 'percentage'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            let text, answer, hint;
+            
+            switch (type) {
+                case 'divide':
+                    const b = Math.floor(Math.random() * 10) + 2;
+                    const answer_val = Math.floor(Math.random() * 20) + 1;
+                    const a = b * answer_val;
+                    answer = answer_val;
+                    text = `${a} : ${b} = ?`;
+                    hint = 'Pembagian';
+                    break;
+                case 'fraction':
+                    const denom = [2, 4, 5, 10][Math.floor(Math.random() * 4)];
+                    const num = Math.floor(Math.random() * (denom - 1)) + 1;
+                    const whole = Math.floor(Math.random() * 100) + 1;
+                    answer = Math.round((whole * num / denom) * 100) / 100;
+                    text = `${whole} x ${num}/${denom} = ?`;
+                    hint = 'Pecahan (bulatkan ke 2 desimal)';
+                    break;
+                case 'percentage':
+                    const base = [50, 100, 200, 250, 500][Math.floor(Math.random() * 5)];
+                    const pct = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
+                    answer = base * pct / 100;
+                    text = `${pct}% dari ${base} = ?`;
+                    hint = 'Persentase';
+                    break;
+            }
+            
+            return { text, answer, hint };
+        }
+
+        function generateHardQuestion() {
+            const types = ['equation', 'mixed', 'power'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            let text, answer, hint;
+            
+            switch (type) {
+                case 'equation':
+                    const x = Math.floor(Math.random() * 20) + 1;
+                    const b = Math.floor(Math.random() * 10) + 1;
+                    const result = x * 2 + b;
+                    answer = x;
+                    text = `2x + ${b} = ${result}, x = ?`;
+                    hint = 'Persamaan linear';
+                    break;
+                case 'mixed':
+                    const a = Math.floor(Math.random() * 10) + 2;
+                    const b = Math.floor(Math.random() * 10) + 2;
+                    const c = Math.floor(Math.random() * 5) + 1;
+                    answer = a * b + c;
+                    text = `${a} x ${b} + ${c} = ?`;
+                    hint = 'Operasi campuran';
+                    break;
+                case 'power':
+                    const base = Math.floor(Math.random() * 5) + 2;
+                    const exp = Math.floor(Math.random() * 3) + 2;
+                    answer = Math.pow(base, exp);
+                    text = `${base}^${exp} = ?`;
+                    hint = 'Perpangkatan';
+                    break;
+            }
+            
+            return { text, answer, hint };
+        }
+
+        function generateExtremeQuestion() {
+            const types = ['sqrt', 'complex', 'geometry'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            
+            let text, answer, hint;
+            
+            switch (type) {
+                case 'sqrt':
+                    const perfectSquares = [4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225];
+                    const sq = perfectSquares[Math.floor(Math.random() * perfectSquares.length)];
+                    answer = Math.sqrt(sq);
+                    text = `Akar dari ${sq} = ?`;
+                    hint = 'Akar kuadrat';
+                    break;
+                case 'complex':
+                    const a = Math.floor(Math.random() * 10) + 3;
+                    const b = Math.floor(Math.random() * 5) + 1;
+                    const c = Math.floor(Math.random() * 3) + 1;
+                    answer = (a * a) + (b * c);
+                    text = `${a}² + ${b} x ${c} = ?`;
+                    hint = 'Operasi kompleks';
+                    break;
+                case 'geometry':
+                    const r = Math.floor(Math.random() * 5) + 2;
+                    answer = Math.round((r * r) * 3.14 * 100) / 100;
+                    text = `Luas lingkaran dengan jari-jari ${r} (π = 3.14) = ?`;
+                    hint = 'Geometri (bulatkan 2 desimal)';
+                    break;
+            }
+            
+            return { text, answer, hint };
+        }
+
+        function generateOptions(answer, difficulty) {
+            const options = [answer];
+            const range = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 20 : difficulty === 'hard' ? 30 : 50;
+            
+            while (options.length < 4) {
+                let wrong;
+                const variance = Math.floor(Math.random() * range) + 1;
+                const sign = Math.random() > 0.5 ? 1 : -1;
+                wrong = Math.round((answer + (variance * sign)) * 100) / 100;
+                
+                if (!options.includes(wrong) && wrong >= 0) {
+                    options.push(wrong);
+                }
+            }
+            
+            // Shuffle options
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            return options;
+        }
+
+        // =====================
+        // Quiz Logic
+        // =====================
+        function startQuiz(difficulty) {
+            quizState.difficulty = difficulty;
+            quizState.currentIndex = 0;
+            quizState.score = 0;
+            quizState.correctCount = 0;
+            quizState.questions = [];
+            quizState.timeLeft = quizState.timePerQuestion || DIFFICULTY_CONFIG[difficulty].time;
+            
+            // Generate questions
+            for (let i = 0; i < quizState.questionCount; i++) {
+                quizState.questions.push(generateQuestion(difficulty));
+            }
+            
+            document.getElementById('totalQuestions').textContent = quizState.questionCount;
+            document.getElementById('quizModal').classList.add('active');
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (quizState.currentIndex >= quizState.questions.length) {
+                endQuiz();
+                return;
+            }
+            
+            const q = quizState.questions[quizState.currentIndex];
+            const options = generateOptions(q.answer, quizState.difficulty);
+            
+            document.getElementById('currentQuestion').textContent = quizState.currentIndex + 1;
+            document.getElementById('questionText').textContent = q.text;
+            document.getElementById('questionHint').textContent = q.hint;
+            
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = options.map((opt, i) => `
+                <button class="option-btn" data-value="${opt}" onclick="selectAnswer(${opt})">
+                    ${opt}
+                </button>
+            `).join('');
+            
+            document.getElementById('quizActions').innerHTML = '';
+            
+            // Start timer
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(quizState.timerInterval);
+            quizState.timeLeft = quizState.timePerQuestion || DIFFICULTY_CONFIG[quizState.difficulty].time;
+            updateTimerDisplay();
+            
+            quizState.timerInterval = setInterval(() => {
+                quizState.timeLeft--;
+                updateTimerDisplay();
+                
+                if (quizState.timeLeft <= 0) {
+                    clearInterval(quizState.timerInterval);
+                    timeUp();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const timerEl = document.getElementById('quizTimer');
+            timerEl.textContent = quizState.timeLeft;
+            
+            if (quizState.timeLeft <= 10) {
+                timerEl.style.color = '#ff4757';
+            } else {
+                timerEl.style.color = 'var(--accent)';
+            }
+        }
+
+        function timeUp() {
+            const q = quizState.questions[quizState.currentIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (parseFloat(btn.dataset.value) === q.answer) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            userData.totalAnswers++;
+            
+            setTimeout(() => {
+                quizState.currentIndex++;
+                showQuestion();
+            }, 1500);
+        }
+
+        function selectAnswer(value) {
+            clearInterval(quizState.timerInterval);
+            
+            const q = quizState.questions[quizState.currentIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            const isCorrect = Math.abs(value - q.answer) < 0.01;
+            
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                if (parseFloat(btn.dataset.value) === q.answer) {
+                    btn.classList.add('correct');
+                } else if (parseFloat(btn.dataset.value) === value && !isCorrect) {
+                    btn.classList.add('wrong');
+                }
+            });
+            
+            userData.totalAnswers++;
+            
+            if (isCorrect) {
+                quizState.correctCount++;
+                const points = DIFFICULTY_CONFIG[quizState.difficulty].points;
+                quizState.score += points;
+                userData.points += points;
+                userData.correctAnswers++;
+            }
+            
+            saveUserData();
+            updateUI();
+            
+            setTimeout(() => {
+                quizState.currentIndex++;
+                showQuestion();
+            }, 1000);
+        }
+
+        function endQuiz() {
+            clearInterval(quizState.timerInterval);
+            document.getElementById('quizModal').classList.remove('active');
+            
+            document.getElementById('resultScore').textContent = quizState.score + ' Poin';
+            
+            let message = '';
+            const accuracy = (quizState.correctCount / quizState.questionCount) * 100;
+            
+            if (accuracy === 100) message = 'Sempurna! Kamu luar biasa!';
+            else if (accuracy >= 80) message = 'Bagus sekali! Terus pertahankan!';
+            else if (accuracy >= 60) message = 'Lumayan! Terus berlatih!';
+            else if (accuracy >= 40) message = 'Masih bisa ditingkatkan!';
+            else message = 'Jangan menyerah, coba lagi!';
+            
+            document.getElementById('resultMessage').innerHTML = `
+                ${quizState.correctCount}/${quizState.questionCount} jawaban benar<br>
+                <span style="color: var(--muted)">${message}</span>
+            `;
+            
+            document.getElementById('resultModal').classList.add('active');
+            
+            saveUserData();
+            updateUI();
+            renderRanksList();
+            renderLeaderboard();
+        }
+
+        function closeResult() {
+            document.getElementById('resultModal').classList.remove('active');
+        }
+
+        function restartQuiz() {
+            closeResult();
+            startQuiz(quizState.difficulty);
+        }
+
+        // =====================
+        // Settings
+        // =====================
+        function saveSettings() {
+            userData.name = document.getElementById('playerNameInput').value || 'Player';
+            quizState.questionCount = parseInt(document.getElementById('questionCountSelect').value);
+            quizState.timePerQuestion = parseInt(document.getElementById('timePerQuestionSelect').value);
+            
+            localStorage.setItem('mathArenaSettings', JSON.stringify({
+                questionCount: quizState.questionCount,
+                timePerQuestion: quizState.timePerQuestion
+            }));
+            
+            saveUserData();
+            renderLeaderboard();
+            showToast('Pengaturan disimpan!', 'success');
+            closeSettingsPanel();
+        }
+
+        function resetProgress() {
+            if (confirm('Apakah kamu yakin ingin mereset semua progress?')) {
+                userData = {
+                    name: userData.name,
+                    points: 0,
+                    correctAnswers: 0,
+                    totalAnswers: 0,
+                    currentDifficulty: 'easy'
+                };
+                saveUserData();
+                updateUI();
+                renderRanksList();
+                renderLeaderboard();
+                showToast('Progress telah direset', 'success');
+                closeSettingsPanel();
+            }
+        }
+
+        function openSettingsPanel() {
+            document.getElementById('settingsPanel').classList.add('active');
+            document.getElementById('settingsOverlay').classList.add('active');
+        }
+
+        function closeSettingsPanel() {
+            document.getElementById('settingsPanel').classList.remove('active');
+            document.getElementById('settingsOverlay').classList.remove('active');
+        }
+
+        function showToast(message, type = '') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // =====================
+        // Event Listeners
+        // =====================
+        function setupEventListeners() {
+            // Difficulty cards
+            document.querySelectorAll('.difficulty-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    startQuiz(card.dataset.difficulty);
+                });
+            });
+            
+            // Nav buttons
+            document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const page = btn.dataset.page;
+                    
+                    document.querySelectorAll('.nav-btn[data-page]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    document.getElementById('homePage').style.display = page === 'home' ? 'block' : 'none';
+                    document.getElementById('leaderboardPage').style.display = page === 'leaderboard' ? 'block' : 'none';
+                    
+                    if (page === 'leaderboard') {
+                        renderLeaderboard();
+                    }
+                });
+            });
+            
+            // Settings
+            document.getElementById('settingsBtn').addEventListener('click', openSettingsPanel);
+            document.getElementById('closeSettings').addEventListener('click', closeSettingsPanel);
+            document.getElementById('settingsOverlay').addEventListener('click', closeSettingsPanel);
+            
+            // Leaderboard tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    // In real app, this would filter by period
+                });
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeSettingsPanel();
+                    if (document.getElementById('quizModal').classList.contains('active')) {
+                        // Optional: allow escape to exit quiz
+                    }
+                }
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
